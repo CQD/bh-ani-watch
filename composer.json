@@ -1,5 +1,6 @@
 {
     "require": {
-        "google/cloud-datastore": "^1.9"
+        "google/cloud-datastore": "^1.9",
+        "minorwork/minorwork": "^0.4.3"
     }
 }

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "b7069d950c4740af23cb76cf5d7f0b2b",
+    "content-hash": "3344b197bb3b2afbcc53403d9c1ef169",
     "packages": [
         {
             "name": "firebase/php-jwt",
@@ -608,6 +608,44 @@
             "time": "2019-07-01T23:21:34+00:00"
         },
         {
+            "name": "minorwork/minorwork",
+            "version": "0.4.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/CQD/minorwork.git",
+                "reference": "c5feda4e2a19e1f02596c6d00649976c55626f3a"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/CQD/minorwork/zipball/c5feda4e2a19e1f02596c6d00649976c55626f3a",
+                "reference": "c5feda4e2a19e1f02596c6d00649976c55626f3a",
+                "shasum": ""
+            },
+            "require": {
+                "nikic/fast-route": "^1.2"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^4|^5|^6|^7"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "0.3-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "MinorWork\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "description": "A minimal framework",
+            "time": "2019-06-07T03:15:20+00:00"
+        },
+        {
             "name": "monolog/monolog",
             "version": "1.24.0",
             "source": {
@@ -684,6 +722,52 @@
                 "psr-3"
             ],
             "time": "2018-11-05T09:00:11+00:00"
+        },
+        {
+            "name": "nikic/fast-route",
+            "version": "v1.3.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/nikic/FastRoute.git",
+                "reference": "181d480e08d9476e61381e04a71b34dc0432e812"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/nikic/FastRoute/zipball/181d480e08d9476e61381e04a71b34dc0432e812",
+                "reference": "181d480e08d9476e61381e04a71b34dc0432e812",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.4.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^4.8.35|~5.7"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "FastRoute\\": "src/"
+                },
+                "files": [
+                    "src/functions.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "BSD-3-Clause"
+            ],
+            "authors": [
+                {
+                    "name": "Nikita Popov",
+                    "email": "nikic@php.net"
+                }
+            ],
+            "description": "Fast request router for PHP",
+            "keywords": [
+                "router",
+                "routing"
+            ],
+            "time": "2018-02-13T20:26:39+00:00"
         },
         {
             "name": "psr/cache",
