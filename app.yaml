@@ -1,0 +1,11 @@
+runtime: php73
+
+handlers:
+
+- url: /s
+  static_dir: public/s
+  secure: always
+
+- url: /.*
+  script: auto
+  secure: always

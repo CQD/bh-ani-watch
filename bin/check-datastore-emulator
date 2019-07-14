@@ -1,0 +1,17 @@
+#!/bin/bash
+DATASTORE_EMULATOR_HOST=${1:-localhost:9081}
+
+echo 檢查 datastore 模擬器有沒有在 ${DATASTORE_EMULATOR_HOST} 跑起來;
+
+STARTED=NO
+for i in `seq 1 5`; do
+    sleep 1
+    echo -n "$i "
+    curl -s ${DATASTORE_EMULATOR_HOST} && STARTED=YES && echo "OK" && break
+done
+
+if [ "$STARTED" == "YES" ]; then
+    echo -e "\033[1;33mDatastore 模擬器在 ${DATASTORE_EMULATOR_HOST} 跑起來了\033[m" && exit 0
+else
+    echo -e "\033[1;31mDatastore 模擬器沒跑起來 /__\\ \033[m" && exit -1
+fi
