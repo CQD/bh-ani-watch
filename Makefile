@@ -13,7 +13,7 @@ buildWithDev:
 server: build start-datastore-emulator
 	php -S localhost:8080 -t public/
 
-deploy: build credential/bh-app.json
+deploy: credential/bh-app.json
 	gcloud app deploy --project=bh-ani-watch --promote --stop-previous-version $(OPTIONS)
 	@echo "\033[1;33mDeploy done.\033[m"
 
