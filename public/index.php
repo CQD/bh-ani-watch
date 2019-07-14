@@ -8,6 +8,8 @@ date_default_timezone_set('Asia/Taipei');
 
 setupConstants();
 
+putenv('GOOGLE_APPLICATION_CREDENTIALS=' . __DIR__ . '/../credential/bh-app.json');
+
 $app = new App;
 $app->handlerClassPrefix = '\Q\BHAniWatch\Controller\\';
 

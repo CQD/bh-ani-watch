@@ -13,9 +13,12 @@ buildWithDev:
 server: build start-datastore-emulator
 	php -S localhost:8080 -t public/
 
-deploy: build
+deploy: build credential/bh-app.json
 	gcloud app deploy --project=bh-ani-watch --promote --stop-previous-version $(OPTIONS)
 	@echo "\033[1;33mDeploy done.\033[m"
+
+credential/bh-app.json:
+	@echo "credential/bh-app.json 不存在，無法 deploy，請至 google console 重新建立" && false
 
 start-datastore-emulator:
 	$(eval export DATASTORE_EMULATOR_HOST=$(DATASTORE_EMULATOR_HOST))
