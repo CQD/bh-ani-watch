@@ -1,4 +1,9 @@
 {
+    "autoload": {
+        "psr-4": {
+            "Q\\BHAniWatch\\": "src/"
+        }
+    },
     "require": {
         "google/cloud-datastore": "^1.9",
         "minorwork/minorwork": "^0.4.3"
