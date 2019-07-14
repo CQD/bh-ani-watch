@@ -1,0 +1,6 @@
+cron:
+
+- description: 撈取巴哈的動畫資料
+  url: /_job/fetchAnimeList
+  schedule: every day 23:00
+  timezone: Asia/Taipei
