@@ -22,32 +22,38 @@ class Anime
         $app->view = json_encode($data);
     }
 
-    public function listId($app, $params, $prevOutput)
+    public function list($app, $params, $prevOutput)
     {
         $store = $this->getStore();
-        $allIds = [];
+        $all = [];
 
         $cursor = '';
         while (true) {
             $query = $store->query()
                 ->kind('anime')
-                ->keysOnly()
-                ->order('order', Query::ORDER_DESCENDING)
                 ->start($cursor);
 
             $res = $store->runQuery($query);
 
             $cursor = false;
             foreach ($res as $anime) {
-                $allIds[] = $anime->key()->pathEndIdentifier();
+                $id = (int) $anime->key()->pathEndIdentifier();
+                $title = $anime->title;
+                $order = $anime->order;
+                $all[$order] = [
+                    'id' => $id,
+                    'title' => $title,
+                ];
                 $cursor = $anime->cursor();
             }
 
             if (!$cursor) break;
         }
 
+        krsort($all, SORT_NUMERIC);
+
         header('Content-Type: application/json');
-        $app->view = json_encode($allIds);
+        $app->view = json_encode(array_values($all));
     }
 
     public function fetchList($app, $params, $prevOutput)

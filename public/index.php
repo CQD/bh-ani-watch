@@ -23,7 +23,7 @@ $app->handlerAlias([
 
 $app->setRouting([
     'animeInfo'     => ['/api/anime/{id:[\d]+}',      ['Anime:info', 'cache']],
-    'animeIdList'   => ['/api/anime/allId',           ['Anime:listId', 'cache']],
+    'animeList'     => ['/api/anime/list',            ['Anime:list', 'cache']],
     'jobAnimeList'  => ['/_job/fetchAnimeList',       'Anime:fetchList'],
 ]);
 $app->run();
