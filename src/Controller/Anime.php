@@ -56,6 +56,34 @@ class Anime
         $app->view = json_encode(array_values($all));
     }
 
+    public function dailyScore($app, $params, $prevOutput)
+    {
+        $startDatetime = strtotime($params['startDate']) ?: false;
+        $endDdatetime = strtotime($params['endDate']) ?: false;
+        if (!$startDatetime || !$endDdatetime) {
+            $app->view = '{}';
+            return;
+        }
+
+        $store = $this->getStore();
+
+        $keys = [];
+        for ($now = $startDatetime; $now <= $endDdatetime;  $now += 86400) {
+            $keys[] = $store->key('anime_daily_score', date('Ymd', $now));
+        }
+        $keys = array_slice($keys, 0, 30); // 避免一次拉太多資料的限制器
+
+        $result = $store->lookupBatch($keys);
+        $data = [];
+        foreach ($result['found'] ?? [] as $entity) {
+            $now = strtotime($entity['date']);
+            $data[date('Y-m-d', $now)] = [
+                'popular' => $entity['popular'] ? json_decode($entity['popular'], true) : null,
+            ];
+        }
+        $app->view = $data ? json_encode($data) : '{}';
+    }
+
     public function fetchList($app, $params, $prevOutput)
     {
         $api = new Api;

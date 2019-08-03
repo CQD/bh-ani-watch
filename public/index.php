@@ -24,6 +24,7 @@ $app->handlerAlias([
 $app->setRouting([
     'animeInfo'     => ['/api/anime/{id:[\d]+}',      ['Anime:info', 'cache']],
     'animeList'     => ['/api/anime/list',            ['Anime:list', 'cache']],
+    'dailyScore'    => ['/api/score/{startDate}~{endDate}',  ['Anime:dailyScore', 'cache']],
     'jobAnimeList'  => ['/_job/fetchAnimeList',       'Anime:fetchList'],
 ]);
 $app->run();
