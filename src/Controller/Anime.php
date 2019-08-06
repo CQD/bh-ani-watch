@@ -114,8 +114,9 @@ class Anime
             usleep(200 * 1000);
         }
 
+        $ymd = date('Ymd');
         $this->saveAnime($data);
-        $this->saveAnimeDailyScore($data);
+        $this->saveAnimeDailyScore($data, $ymd);
         $app->view = 'done';
     }
 
@@ -150,9 +151,8 @@ class Anime
         }
     }
 
-    private function saveAnimeDailyScore($data)
+    private function saveAnimeDailyScore($data, $ymd)
     {
-        $ymd = date('Ymd');
         $store = $this->getStore();
 
         $score = [];
