@@ -10,6 +10,7 @@
     grid-column-gap: 1em;
     margin: 0 auto;
     max-width:1000px;
+    color:#333;
 }
 #inputBlock{
     position:relative;
@@ -19,6 +20,8 @@
     width: 100%;
     padding: 5px;
     box-sizing: border-box;
+    border:1px solid #ccc;
+    border-radius: 3px;
 }
 #animeSelect{
     position:absolute;
@@ -43,11 +46,16 @@
 #animeSelect .anime:hover{
     background-color:#def;
 }
+#selectedAnimes{
+    font-size:13px;
+    padding-left:1.1em;
+}
 .deleteButton{
     display:inline-block;
     height: 1.2em;
     vertical-align: middle;
     cursor:pointer;
+    margin-left:-1.2em;
 }
 </style>
 </head>
@@ -91,7 +99,7 @@ let selectAnime = function(id, doUpdateChart){
     }
 
     let $selectedAnime = makeAnimeEle(`selected-${id}`, anime)
-        .append($deleteButton)
+        .prepend($deleteButton)
         .addClass('anime')
         .appendTo($selected);
 
@@ -120,6 +128,7 @@ let updateChart = function(){
         let anime = $(this).data();
         let dataset = {
             'label': anime.title,
+            'lineTension': 0.25,
             'fill': false,
             'data': [],
             'borderColor': `rgb(${183 + (anime.id * 100) % 67}, ${183 + (anime.id * 1000) % 67}, ${183 + (anime.id * 10000) % 67})`,
