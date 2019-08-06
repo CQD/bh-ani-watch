@@ -71,7 +71,7 @@ class Anime
         for ($now = $startDatetime; $now <= $endDdatetime;  $now += 86400) {
             $keys[] = $store->key('anime_daily_score', date('Ymd', $now));
         }
-        $keys = array_slice($keys, 0, 30); // 避免一次拉太多資料的限制器
+        $keys = array_slice($keys, 0, 100); // 避免一次拉太多資料的限制器
 
         $result = $store->lookupBatch($keys);
         $data = [];
