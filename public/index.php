@@ -28,7 +28,7 @@ $app->setRouting([
     'home'          => ['/',                          ['home', 'cache']],
     'animeInfo'     => ['/api/anime/{id:[\d]+}',      ['Anime:info', 'cache']],
     'animeList'     => ['/api/anime/list',            ['Anime:list', 'cache']],
-    'dailyScore'    => ['/api/score/{startDate}~{endDate}',  ['Anime:dailyScore', 'cache']],
+    'dailyScore'    => ['/api/score/season',          ['Anime:dailyScore', 'cache']],
     'jobAnimeList'  => ['/_job/fetchAnimeList',       'Anime:fetchList'],
 ]);
 $app->run();

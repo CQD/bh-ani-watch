@@ -58,12 +58,9 @@ class Anime
 
     public function dailyScore($app, $params, $prevOutput)
     {
-        $startDatetime = strtotime($params['startDate']) ?: false;
-        $endDdatetime = strtotime($params['endDate']) ?: false;
-        if (!$startDatetime || !$endDdatetime) {
-            $app->view = '{}';
-            return;
-        }
+        $startDatetime = time() - 86400 * 95;
+        $endDdatetime = time();
+
         $startDatetime -= 86400; // 往前多取一天，好處理 Diff
 
         $store = $this->getStore();

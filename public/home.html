@@ -143,7 +143,7 @@ aSeasonAgo = aSeasonAgo.toISOString().substring(0, 10);
 
 Promise.all([
     fetch('/api/anime/list'),
-    fetch(`/api/score/${aSeasonAgo}~${today}`),
+    fetch('/api/score/season'),
 ])
 .then(function(resps){
     return Promise.all(resps.map(res => res.json()))
