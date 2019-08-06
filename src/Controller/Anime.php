@@ -64,6 +64,7 @@ class Anime
             $app->view = '{}';
             return;
         }
+        $startDatetime -= 86400; // 往前多取一天，好處理 Diff
 
         $store = $this->getStore();
 
@@ -81,7 +82,22 @@ class Anime
                 'popular' => $entity['popular'] ? json_decode($entity['popular'], true) : null,
             ];
         }
-        $app->view = $data ? json_encode($data) : '{}';
+
+        $yesterdayScores = ['popular' => []];
+        foreach ($data as $date => $scores) {
+            foreach ($scores['popular'] as $id => $popular) {
+                $popularDiff = ('2019-07-14' === $date)
+                    ? 0
+                    : $popular - ($yesterdayScores['popular'][$id] ?? 0);
+                $data[$date]['popular-diff'][$id] = $popularDiff;
+            }
+            $yesterdayScores = $scores;
+        }
+
+        unset($data[date('Y-m-d', $startDatetime)]); // 把多取的那一天的資料砍掉
+
+        ksort($data);
+        $app->view = json_encode($data, JSON_FORCE_OBJECT);
     }
 
     public function fetchList($app, $params, $prevOutput)
