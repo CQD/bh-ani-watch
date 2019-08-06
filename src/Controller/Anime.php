@@ -95,7 +95,6 @@ class Anime
 
         unset($data[date('Y-m-d', $startDatetime)]); // 把多取的那一天的資料砍掉
 
-        ksort($data);
         $app->view = json_encode($data, JSON_FORCE_OBJECT);
     }
 
