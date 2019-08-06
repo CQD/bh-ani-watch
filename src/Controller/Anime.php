@@ -83,6 +83,8 @@ class Anime
             ];
         }
 
+        ksort($data);
+
         $yesterdayScores = ['popular' => []];
         foreach ($data as $date => $scores) {
             foreach ($scores['popular'] as $id => $popular) {
