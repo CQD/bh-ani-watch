@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>標題未定</title>
+<style>
+#main{
+    display:grid;
+    grid-template-columns: 15em auto;
+    grid-column-gap: 1em;
+    margin: 0 auto;
+    max-width:1000px;
+}
+#inputBlock{
+    position:relative;
+}
+#nameInput{
+    font-size:1rem;
+    width: 100%;
+    padding: 5px;
+    box-sizing: border-box;
+}
+#animeSelect{
+    position:absolute;
+    left:0;
+    top: calc(1rem + 10px);
+    border:1px solid #ccc;
+    max-height:80vh;
+    max-width:90vw;
+    overflow-y: scroll;
+    overflow-x: hidden;
+    display: none;
+    z-index:1;
+    background-color:#f9f9f9;
+}
+.anime{
+    line-height:1.5;
+    padding:0.3em;
+}
+.anime.off, .anime.selected{
+    display:none;
+}
+#animeSelect .anime:hover{
+    background-color:#def;
+}
+.deleteButton{
+    display:inline-block;
+    height: 1.2em;
+    vertical-align: middle;
+    cursor:pointer;
+}
+</style>
+</head>
+<body>
+<div id="main">
+    <div id="inputBlock">
+        <input type="text" id="nameInput" placeholder="請輸入動畫名稱">
+        <div id="animeSelect"></div>
+        <div id="selectedAnimes"></div>
+    </div>
+    <div id="mainBlock">
+        <div id="msg"></div>
+        <div><select id="typeSelect"><option value="popular-diff">每日變化量</option><option value="popular">每日總累積</option></select></div>
+        <canvas id="chart"></canvas>
+    </div>
+</div>
+<script src="/s/iquery.min.js"></script>
+<script src="/s/Chart.min.js"></script>
+<script><!--
+let $animeSelect = $('#animeSelect');
+let $selected = $('#selectedAnimes');
+let $nameInput = $('#nameInput');
+
+let makeAnimeEle = function(id, anime){
+    return  $('<div>')
+        .attr("id", id)
+        .text(anime.title)
+        .data(anime)
+        .addClass('anime')
+}
+
+let selectAnime = function(id, doUpdateChart){
+    let $anime = $(`#anime-${id}`);
+    let anime = $anime.data();
+
+    let $deleteButton = $('<img>')
+        .addClass('deleteButton')
+        .attr('src', '/s/trashcan.svg')
+    $deleteButton[0].onclick = function(){
+        deselectAnime(id);
+    }
+
+    let $selectedAnime = makeAnimeEle(`selected-${id}`, anime)
+        .append($deleteButton)
+        .addClass('anime')
+        .appendTo($selected);
+
+
+    $anime.addClass('selected');
+    $animeSelect.css('display', 'none');
+    $nameInput.val('');
+
+    if (undefined === doUpdateChart || doUpdateChart) {
+        updateChart();
+    }
+}
+
+let deselectAnime = function(id){
+    $(`#selected-${id}`).remove();
+    $(`#anime-${id}`).removeClass('selected');
+    updateChart();
+}
+
+let updateChart = function(){
+    let $animes = $('#selectedAnimes .anime');
+    let type = $('#typeSelect').val();
+
+    let datasets = [];
+    $animes.each(function(){
+        let anime = $(this).data();
+        let dataset = {
+            'label': anime.title,
+            'fill': false,
+            'data': [],
+            'borderColor': `rgb(${183 + (anime.id * 100) % 67}, ${183 + (anime.id * 1000) % 67}, ${183 + (anime.id * 10000) % 67})`,
+        };
+        dataset.backgroundColor = dataset.borderColor;
+        for (let date in window.scores) {
+            dataset.data.push(window.scores[date][type][anime.id]);
+        }
+        datasets.push(dataset);
+    });
+
+    window.chart.data.datasets = datasets;
+    window.chart.update();
+}
+
+let today = new Date();
+let aSeasonAgo = new Date();
+aSeasonAgo.setDate(today.getDate()-95);
+today = today.toISOString().substring(0, 10);
+aSeasonAgo = aSeasonAgo.toISOString().substring(0, 10);
+
+Promise.all([
+    fetch('/api/anime/list'),
+    fetch(`/api/score/${aSeasonAgo}~${today}`),
+])
+.then(function(resps){
+    return Promise.all(resps.map(res => res.json()))
+})
+.then(data => {
+    let scores = data[1];
+    window.scores = scores
+
+    let dates = [];
+    for (let date in scores) {
+        dates.push(date);
+    }
+
+    let ctx = document.getElementById('chart').getContext('2d');
+    window.chart = new Chart(ctx, {
+        'type': 'line',
+        'data': {
+            labels: dates,
+        }
+    });
+
+    return data[0];
+})
+.then(animes => {
+    window.animes = animes;
+
+    animes.forEach(function(anime){
+        let $anime = makeAnimeEle(`anime-${anime.id}`, anime)
+            .appendTo($animeSelect);
+
+        $anime[0].onclick = function(){
+            selectAnime($(this).data('id'))
+        }
+    });
+
+    let cnt = 0;
+    for (let idx in animes) {
+        selectAnime(animes[idx].id, false);
+        cnt++;
+        if (cnt >= 10) {
+            break;
+        }
+    }
+    updateChart();
+})
+.then(() => {
+    $nameInput[0].oninput = function(){
+        let val = $nameInput.val();
+        if (val.length < 1) {
+            $animeSelect.css('display', 'none');
+            return;
+        }
+        val = val.toLowerCase();
+
+        let selectCnt = 0;
+        $('#animeSelect .anime').each(function(){
+            let $this = $(this);
+
+            if (this.textContent.toLowerCase().indexOf(val) >= 0) {
+                $this.removeClass('off');
+                selectCnt++;
+            } else {
+                $this.addClass('off');
+            }
+        });
+
+        $animeSelect.css('display', (selectCnt) ? 'block' : 'none');
+    }
+
+    $('#typeSelect')[0].onchange = function () {
+        updateChart();
+    }
+
+})
+.catch(e => {
+    console.log('Failed...', e); // TODO 顯示更舒服的錯誤訊息
+    alert('無法取得動畫資料');
+});
+
+
+
+--></script>
+</body>
+</html>

@@ -19,9 +19,13 @@ $app->handlerAlias([
         header("ETag: {$etag}");
         header("Cache-Control: public, max-age=86400");
     },
+    'home' => function($app){
+        $app->view = file_get_contents(__DIR__ . '/home.html');
+    },
 ]);
 
 $app->setRouting([
+    'home'          => ['/',                          ['home', 'cache']],
     'animeInfo'     => ['/api/anime/{id:[\d]+}',      ['Anime:info', 'cache']],
     'animeList'     => ['/api/anime/list',            ['Anime:list', 'cache']],
     'dailyScore'    => ['/api/score/{startDate}~{endDate}',  ['Anime:dailyScore', 'cache']],
