@@ -16,8 +16,9 @@ $app->handlerClassPrefix = '\Q\BHAniWatch\Controller\\';
 $app->handlerAlias([
     'cache' => function($app){
         $etag = md5((string) $app->view);
+        $maxAge = (strtotime('tomorrow 13:00') - time()) % 86400;
         header("ETag: {$etag}");
-        header("Cache-Control: public, max-age=86400");
+        header("Cache-Control: public, max-age={$maxAge}");
     },
     'home' => function($app){
         $app->view = file_get_contents(__DIR__ . '/home.html');
