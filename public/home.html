@@ -135,7 +135,8 @@ let updateChart = function(){
         };
         dataset.backgroundColor = dataset.borderColor;
         for (let date in window.scores) {
-            dataset.data.push(window.scores[date][type][anime.id]);
+            let typeScore = window.scores[date][type] || {}
+            dataset.data.push(typeScore[anime.id] || 0);
         }
         datasets.push(dataset);
     });

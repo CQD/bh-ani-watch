@@ -61,8 +61,6 @@ class Anime
         $startDatetime = time() - 86400 * 95;
         $endDdatetime = time();
 
-        $startDatetime -= 86400; // 往前多取一天，好處理 Diff
-
         $store = $this->getStore();
 
         $keys = [];
@@ -82,18 +80,15 @@ class Anime
 
         ksort($data);
 
-        $yesterdayScores = ['popular' => []];
         foreach ($data as $date => $scores) {
+            $tomorrow = date('Y-m-d', strtotime($date) + 86400);
+            $tomorrowScores = $data[$tomorrow] ?? [];
             foreach ($scores['popular'] as $id => $popular) {
-                $popularDiff = ('2019-07-14' === $date)
-                    ? 0
-                    : $popular - ($yesterdayScores['popular'][$id] ?? 0);
-                $data[$date]['popular-diff'][$id] = $popularDiff;
+                if (isset($tomorrowScores['popular'][$id])) {
+                    $data[$date]['popular-diff'][$id] = $tomorrowScores['popular'][$id] - $popular;
+                }
             }
-            $yesterdayScores = $scores;
         }
-
-        unset($data[date('Y-m-d', $startDatetime)]); // 把多取的那一天的資料砍掉
 
         $app->view = json_encode($data, JSON_FORCE_OBJECT);
     }
