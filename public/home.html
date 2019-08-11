@@ -188,10 +188,29 @@ Promise.all([
             selectAnime($(this).data('id'))
         }
     });
+})
+.then(() => {
+    let maxDate = '1000-01-01';
+    for (let date in window.scores) {
+        maxDate = (date > maxDate) ? date : maxDate;
+    }
+    maxDate = new Date(new Date(maxDate).getTime() - 86400 * 1000).toISOString().substring(0, 10);
+
+    let sortLand = [];
+    for (let animeId in window.scores[maxDate]['popular-diff']) {
+        sortLand.push([animeId, window.scores[maxDate]['popular-diff'][animeId]]);
+    }
+
+    sortLand.sort((a,b) => {
+        return a[1] > b[1]
+            ? -1
+            : a[1] < b[1] ? 1 : 0;
+    });
 
     let cnt = 0;
-    for (let idx in animes) {
-        selectAnime(animes[idx].id, false);
+    for (let idx in sortLand) {
+        let foo = sortLand[idx];
+        selectAnime(foo[0], false);
         cnt++;
         if (cnt >= 10) {
             break;
