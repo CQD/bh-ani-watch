@@ -120,6 +120,14 @@ let deselectAnime = function(id){
     updateChart();
 }
 
+let animeColor = function(id){
+    // 拿 id 去 mod 質數其實不是很理想的 srand(id) 替代方案...
+    let h = (id * 200 + 1) % 359;
+    let s = 51 + (id * 1000) % 47;
+    let l = 40 + (id * 359 + 1) % 29;
+    return `hsla(${h}, ${s}%, ${l}%, 0.5)`;
+}
+
 let updateChart = function(){
     let $animes = $('#selectedAnimes .anime');
     let type = $('#typeSelect').val();
@@ -132,7 +140,7 @@ let updateChart = function(){
             'lineTension': 0.25,
             'fill': false,
             'data': [],
-            'borderColor': `rgb(${183 + (anime.id * 100) % 67}, ${183 + (anime.id * 1000) % 67}, ${183 + (anime.id * 10000) % 67})`,
+            'borderColor': animeColor(anime.id)
         };
         dataset.backgroundColor = dataset.borderColor;
         for (let date in window.scores) {
@@ -258,8 +266,6 @@ Promise.all([
     console.log('Failed...', e); // TODO 顯示更舒服的錯誤訊息
     alert('無法取得動畫資料');
 });
-
-
 
 --></script>
 </body>
