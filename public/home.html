@@ -81,6 +81,11 @@ let $selected = $('#selectedAnimes');
 let $nameInput = $('#nameInput');
 
 let makeAnimeEle = function(id, anime){
+    if (!anime.title) {
+        anime.id = id.split('-')[1];
+        anime.title = `[ID:${anime.id}]`;
+    }
+
     return  $('<div>')
         .attr("id", id)
         .text(anime.title)
