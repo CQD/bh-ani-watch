@@ -173,6 +173,12 @@ Promise.all([
         'type': 'line',
         'data': {
             labels: dates,
+        },
+        'options': {
+            'tooltips': {
+                'itemSort': (a, b, data) => b.yLabel - a.yLabel,
+                'mode': 'index',
+            }
         }
     });
 
