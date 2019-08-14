@@ -68,7 +68,11 @@
     </div>
     <div id="mainBlock">
         <div id="msg"></div>
-        <div><select id="typeSelect"><option value="popular-diff">每日變化量</option><option value="popular">每日總累積</option></select></div>
+        <div>
+            <select id="typeSelect"><option value="popular-diff">每日變化量</option><option value="popular">每日總累積</option></select>
+            <button id="loadPrevDayTop">載入前日最高人氣</button>
+            <button id="loadAllTop">載入累積最高人氣</button>
+        </div>
         <canvas id="chart"></canvas>
         <p style="font-size:small;color:#999;text-align:center;">註：2019-08-07 之前的人氣分數可能會前後差一天，導致變化量計算飆高或歸零。</p>
     </div>
@@ -93,35 +97,45 @@ let makeAnimeEle = function(id, anime){
         .addClass('anime')
 }
 
-let selectAnime = function(id, doUpdateChart){
-    let $anime = $(`#anime-${id}`);
-    let anime = $anime.data();
-
-    let $deleteButton = $('<img>')
-        .addClass('deleteButton')
-        .attr('src', '/s/trashcan.svg')
-    $deleteButton[0].onclick = function(){
-        deselectAnime(id);
+let selectAnime = function(ids){
+    if (!Array.isArray(ids)) {
+        ids = [ids];
     }
 
-    let $selectedAnime = makeAnimeEle(`selected-${id}`, anime)
-        .prepend($deleteButton)
-        .addClass('anime')
-        .appendTo($selected);
+    ids.forEach(id => {
+        let $anime = $(`#anime-${id}`);
+        let anime = $anime.data();
+
+        let $deleteButton = $('<img>')
+            .addClass('deleteButton')
+            .attr('src', '/s/trashcan.svg')
+        $deleteButton[0].onclick = function(){
+            deselectAnime(id);
+        }
+
+        let $selectedAnime = makeAnimeEle(`selected-${id}`, anime)
+            .prepend($deleteButton)
+            .addClass('anime')
+            .appendTo($selected);
 
 
-    $anime.addClass('selected');
+        $anime.addClass('selected');
+    });
+
     $animeSelect.css('display', 'none');
     $nameInput.val('');
 
-    if (undefined === doUpdateChart || doUpdateChart) {
-        updateChart();
-    }
+    updateChart();
 }
 
-let deselectAnime = function(id){
-    $(`#selected-${id}`).remove();
-    $(`#anime-${id}`).removeClass('selected');
+let deselectAnime = function(ids){
+    if (!Array.isArray(ids)) {
+        ids = [ids];
+    }
+    ids.forEach(id => {
+        $(`#selected-${id}`).remove();
+        $(`#anime-${id}`).removeClass('selected');
+    });
     updateChart();
 }
 
@@ -158,6 +172,31 @@ let updateChart = function(){
     window.chart.data.datasets = datasets;
     window.chart.update();
 }
+
+let loadByScore = function(scoreName){
+    let maxDate = Object.keys(window.scores)
+        .reduce((maxDate, date) => maxDate = (date > maxDate) ? date : maxDate);
+
+    maxDate = new Date(new Date(maxDate).getTime() - 86400 * 1000).toISOString().substring(0, 10);
+
+    let sortLand = [];
+    for (let animeId in window.scores[maxDate][scoreName]) {
+        sortLand.push([animeId, window.scores[maxDate][scoreName][animeId]]);
+    }
+
+    sortLand.sort((a,b) => {
+        return a[1] > b[1]
+            ? -1
+            : a[1] < b[1] ? 1 : 0;
+    });
+
+    $('#typeSelect').val(scoreName);
+    deselectAnime(Array.prototype.slice.call(document.querySelectorAll('#selectedAnimes .anime')).map(e => e.dataset.id));
+    selectAnime(sortLand.slice(0, 15).map(n => n[0]));
+}
+
+let loadPrevDayTop = loadByScore.bind(null, 'popular-diff');
+let loadAllTop = loadByScore.bind(null, 'popular');
 
 let today = new Date();
 let aSeasonAgo = new Date();
@@ -209,35 +248,7 @@ Promise.all([
         }
     });
 })
-.then(() => {
-    let maxDate = '1000-01-01';
-    for (let date in window.scores) {
-        maxDate = (date > maxDate) ? date : maxDate;
-    }
-    maxDate = new Date(new Date(maxDate).getTime() - 86400 * 1000).toISOString().substring(0, 10);
-
-    let sortLand = [];
-    for (let animeId in window.scores[maxDate]['popular-diff']) {
-        sortLand.push([animeId, window.scores[maxDate]['popular-diff'][animeId]]);
-    }
-
-    sortLand.sort((a,b) => {
-        return a[1] > b[1]
-            ? -1
-            : a[1] < b[1] ? 1 : 0;
-    });
-
-    let cnt = 0;
-    for (let idx in sortLand) {
-        let foo = sortLand[idx];
-        selectAnime(foo[0], false);
-        cnt++;
-        if (cnt >= 15) {
-            break;
-        }
-    }
-    updateChart();
-})
+.then(loadPrevDayTop)
 .then(() => {
     $nameInput[0].oninput = function(){
         let val = $nameInput.val();
@@ -266,6 +277,8 @@ Promise.all([
         updateChart();
     }
 
+    $('#loadPrevDayTop')[0].onclick = loadPrevDayTop;
+    $('#loadAllTop')[0].onclick = loadAllTop;
 })
 .catch(e => {
     console.log('Failed...', e); // TODO 顯示更舒服的錯誤訊息
