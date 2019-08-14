@@ -31,6 +31,7 @@ class Anime
         while (true) {
             $query = $store->query()
                 ->kind('anime')
+                ->order('order', Query::ORDER_DESCENDING)
                 ->start($cursor);
 
             $res = $store->runQuery($query);
@@ -39,8 +40,7 @@ class Anime
             foreach ($res as $anime) {
                 $id = (int) $anime->key()->pathEndIdentifier();
                 $title = $anime->title;
-                $order = $anime->order;
-                $all[$order] = [
+                $all[] = [
                     'id' => $id,
                     'title' => $title,
                 ];
@@ -49,8 +49,6 @@ class Anime
 
             if (!$cursor) break;
         }
-
-        krsort($all, SORT_NUMERIC);
 
         header('Content-Type: application/json');
         $app->view = json_encode(array_values($all));
