@@ -72,6 +72,9 @@
             <select id="typeSelect"><option value="popular-diff">每日變化量</option><option value="popular">每日總累積</option></select>
             <button id="loadPrevDayTop">載入前日最高人氣</button>
             <button id="loadAllTop">載入累積最高人氣</button>
+            <button id="saveList">儲存目前清單</button>
+            <button id="loadSaved">載入已儲存清單</button>
+            <button id="clearSaved">清除已儲存清單</button>
         </div>
         <canvas id="chart"></canvas>
         <p style="font-size:small;color:#999;text-align:center;">註：2019-08-07 之前的人氣分數可能會前後差一天，導致變化量計算飆高或歸零。</p>
@@ -173,6 +176,10 @@ let updateChart = function(){
     window.chart.update();
 }
 
+let currentAnimeIds = function(){
+    return Array.prototype.slice.call(document.querySelectorAll('#selectedAnimes .anime')).map(e => e.dataset.id);
+}
+
 let loadByScore = function(scoreName){
     let maxDate = Object.keys(window.scores)
         .reduce((maxDate, date) => maxDate = (date > maxDate) ? date : maxDate);
@@ -191,12 +198,33 @@ let loadByScore = function(scoreName){
     });
 
     $('#typeSelect').val(scoreName);
-    deselectAnime(Array.prototype.slice.call(document.querySelectorAll('#selectedAnimes .anime')).map(e => e.dataset.id));
+    deselectAnime(currentAnimeIds());
     selectAnime(sortLand.slice(0, 15).map(n => n[0]));
 }
 
 let loadPrevDayTop = loadByScore.bind(null, 'popular-diff');
 let loadAllTop = loadByScore.bind(null, 'popular');
+
+let saveList = function(){
+    let ids = currentAnimeIds().join(',');
+    if (!ids) {
+        alert('目前沒有選擇任何動畫');
+        return;
+    }
+    localStorage['anime_list'] = ids;
+    alert('已儲存目前的動畫清單');
+}
+
+let loadSaved = function(){
+    let ids = localStorage['anime_list'];
+    if (!ids) {
+        alert('沒有已儲存的動畫清單');
+        return;
+    }
+    ids = ids.split(',');
+    deselectAnime(currentAnimeIds());
+    selectAnime(ids);
+}
 
 let today = new Date();
 let aSeasonAgo = new Date();
@@ -248,7 +276,13 @@ Promise.all([
         }
     });
 })
-.then(loadPrevDayTop)
+.then(() => {
+    if (localStorage['anime_list']) {
+        loadSaved();
+    } else {
+        loadPrevDayTop()
+    }
+})
 .then(() => {
     $nameInput[0].oninput = function(){
         let val = $nameInput.val();
@@ -279,6 +313,12 @@ Promise.all([
 
     $('#loadPrevDayTop')[0].onclick = loadPrevDayTop;
     $('#loadAllTop')[0].onclick = loadAllTop;
+    $('#saveList')[0].onclick = saveList;
+    $('#loadSaved')[0].onclick = loadSaved;
+    $('#clearSaved')[0].onclick = function(){
+        localStorage.clear();
+        alert('已清除儲存的動畫清單');
+    }
 })
 .catch(e => {
     console.log('Failed...', e); // TODO 顯示更舒服的錯誤訊息
