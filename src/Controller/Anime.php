@@ -65,15 +65,17 @@ class Anime
         for ($now = $startDatetime; $now <= $endDdatetime;  $now += 86400) {
             $keys[] = $store->key('anime_daily_score', date('Ymd', $now));
         }
-        $keys = array_slice($keys, 0, 100); // 避免一次拉太多資料的限制器
 
-        $result = $store->lookupBatch($keys);
         $data = [];
-        foreach ($result['found'] ?? [] as $entity) {
-            $now = strtotime($entity['date']);
-            $data[date('Y-m-d', $now)] = [
-                'popular' => $entity['popular'] ? json_decode($entity['popular'], true) : null,
-            ];
+
+        foreach (array_chunk($keys, 30) as $key_chunk) {
+            $result = $store->lookupBatch($key_chunk);
+            foreach ($result['found'] ?? [] as $entity) {
+                $now = strtotime($entity['date']);
+                $data[date('Y-m-d', $now)] = [
+                    'popular' => $entity['popular'] ? json_decode($entity['popular'], true) : null,
+                ];
+            }
         }
 
         ksort($data);
